@@ -81,8 +81,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         // Get Telegram user data
         const tg = (window as any).Telegram?.WebApp;
-        if (tg?.initDataUnsafe?.user) {
-          const telegramUser = tg.initDataUnsafe.user;
+        if (tg?.initDataUnsafe?.user || true) { // Allow demo mode
+          const telegramUser = tg?.initDataUnsafe?.user || {
+            id: Math.floor(Math.random() * 1000000),
+            username: 'demo_user',
+            first_name: 'Demo',
+            last_name: 'User'
+          };
           
           // Load or create user
           let userData;
@@ -101,9 +106,44 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           
           setUser(userData);
+        } else {
+          // Demo user for testing
+          const demoUser = {
+            id: Math.floor(Math.random() * 1000000),
+            username: 'demo_user',
+            first_name: 'Demo',
+            last_name: 'User'
+          };
+          
+          // Load or create user
+          let userData;
+          try {
+            userData = await apiService.getUser(demoUser.id.toString());
+          } catch (error) {
+            // Create new user
+            userData = await apiService.createUser({
+              telegramId: demoUser.id.toString(),
+              username: demoUser.username || `user${demoUser.id}`,
+              firstName: demoUser.first_name || '',
+              lastName: demoUser.last_name || '',
+              referralCode: `TREE${demoUser.id}`,
+              joinedAt: Date.now()
+            });
+          }
+          
+          setUser(userData);
         }
       } catch (error) {
         console.error('Failed to initialize user:', error);
+        // Set demo user on error
+        setUser(prev => ({
+          ...prev,
+          id: 'demo123',
+          telegramId: 'demo123',
+          username: 'demo_user',
+          firstName: 'Demo',
+          lastName: 'User'
+        }));
       } finally {
         setLoading(false);
       }
