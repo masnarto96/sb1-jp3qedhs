@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Wallet as WalletIcon, Link, Coins, TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
+import { TonConnectButton } from '@tonconnect/ui-react';
 import { useUser } from '../contexts/UserContext';
 import { tonService } from '../services/tonService';
 

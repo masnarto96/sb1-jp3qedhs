@@ -2,7 +2,7 @@ export const TON_CONFIG = {
   // Mainnet configuration
   network: 'mainnet',
   apiEndpoint: 'https://toncenter.com/api/v2/',
-  apiKey: process.env.VITE_TON_API_KEY || '',
+  apiKey: import.meta.env.VITE_TON_API_KEY || '',
   
   // Contract addresses (deploy your own contracts)
   contracts: {
@@ -18,7 +18,7 @@ export const TON_CONFIG = {
   // Admin configuration
   admin: {
     walletAddress: 'UQD...', // Admin wallet address
-    secretKey: process.env.VITE_ADMIN_SECRET || 'your-admin-secret-key'
+    secretKey: import.meta.env.VITE_ADMIN_SECRET || 'demo-admin-secret'
   },
   
   // Mining rates and economics
@@ -34,6 +34,6 @@ export const TON_CONFIG = {
 
 export const TELEGRAM_CONFIG = {
   botToken: TON_CONFIG.bot.token,
-  webhookUrl: process.env.VITE_WEBHOOK_URL || 'https://your-domain.com/webhook',
-  miniAppUrl: process.env.VITE_MINI_APP_URL || 'https://your-domain.com'
+  webhookUrl: import.meta.env.VITE_WEBHOOK_URL || 'https://your-domain.com/webhook',
+  miniAppUrl: import.meta.env.VITE_MINI_APP_URL || 'https://your-domain.com'
 };

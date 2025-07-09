@@ -215,29 +215,33 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const connectWallet = async () => {
     try {
       const wallet = await tonService.connectWallet();
-      const balance = await tonService.getBalance(wallet.address);
-      
-      setUser(prev => ({
-        ...prev,
-        walletAddress: wallet.address,
-        tonBalance: balance,
-        isWalletConnected: true
-      }));
+      if (wallet && wallet.address) {
+        const balance = await tonService.getBalance(wallet.address);
+        
+        setUser(prev => ({
+          ...prev,
+          walletAddress: wallet.address,
+          tonBalance: balance,
+          isWalletConnected: true
+        }));
 
-      await apiService.updateUser(user.id, {
-        walletAddress: wallet.address,
-        tonBalance: balance,
-        isWalletConnected: true
-      });
+        await apiService.updateUser(user.id, {
+          walletAddress: wallet.address,
+          tonBalance: balance,
+          isWalletConnected: true
+        });
+      }
     } catch (error) {
       console.error('Failed to connect wallet:', error);
-      throw error;
+      // Don't throw error to prevent UI crashes
+      alert('Failed to connect wallet. Please try again.');
     }
   };
 
   const disconnectWallet = async () => {
     try {
       await tonService.disconnect();
+      
       setUser(prev => ({
         ...prev,
         walletAddress: '',
@@ -254,6 +258,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Failed to disconnect wallet:', error);
     }
   };
+
 
   const processWithdrawal = async (amount: number, type: 'ton' | 'coins') => {
     try {

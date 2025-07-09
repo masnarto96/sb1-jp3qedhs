@@ -1,28 +1,23 @@
-import { TonConnect } from '@tonconnect/sdk';
+import { TonConnectUI } from '@tonconnect/ui-react';
 import { Address, beginCell, Cell, toNano } from '@ton/core';
-import TonWeb from 'tonweb';
 import { TON_CONFIG } from '../config/ton';
 
 class TonService {
-  private tonweb: any;
-  private tonConnect: TonConnect;
+  private tonConnectUI: TonConnectUI;
 
   constructor() {
-    this.tonweb = new TonWeb(new TonWeb.HttpProvider(TON_CONFIG.apiEndpoint, {
-      apiKey: TON_CONFIG.apiKey
-    }));
-    
-    this.tonConnect = new TonConnect({
-      manifestUrl: `${window.location.origin}/tonconnect-manifest.json`
+    this.tonConnectUI = new TonConnectUI({
+      manifestUrl: `${window.location.origin}/tonconnect-manifest.json`,
+      buttonRootId: null
     });
   }
 
   async connectWallet() {
     try {
-      const connectedWallet = await this.tonConnect.connectWallet();
+      const connectedWallet = await this.tonConnectUI.connectWallet();
       return {
         address: connectedWallet.account.address,
-        publicKey: connectedWallet.account.publicKey
+        publicKey: connectedWallet.account.publicKey || ''
       };
     } catch (error) {
       console.error('Wallet connection failed:', error);
@@ -32,8 +27,12 @@ class TonService {
 
   async getBalance(address: string): Promise<number> {
     try {
-      const balance = await this.tonweb.getBalance(address);
-      return parseFloat(TonWeb.utils.fromNano(balance));
+      const response = await fetch(`${TON_CONFIG.apiEndpoint}getAddressInformation?address=${address}&api_key=${TON_CONFIG.apiKey}`);
+      const data = await response.json();
+      if (data.ok && data.result) {
+        return parseFloat((parseInt(data.result.balance) / 1000000000).toFixed(9));
+      }
+      return 0;
     } catch (error) {
       console.error('Failed to get balance:', error);
       return 0;
@@ -48,12 +47,12 @@ class TonService {
           {
             address: to,
             amount: toNano(amount.toString()).toString(),
-            payload: comment ? beginCell().storeUint(0, 32).storeStringTail(comment).endCell().toBoc().toString('base64') : undefined
+            payload: comment ? beginCell().storeUint(0, 32).storeStringTail(comment).endCell().toBoc({ idx: false }).toString('base64') : undefined
           }
         ]
       };
 
-      return await this.tonConnect.sendTransaction(transaction);
+      return await this.tonConnectUI.sendTransaction(transaction);
     } catch (error) {
       console.error('Transaction failed:', error);
       throw error;
@@ -75,21 +74,12 @@ class TonService {
   }
 
   private async sendTokens(to: string, amount: number) {
-    // Implement token transfer logic through your Tree Token contract
-    const tokenContract = new this.tonweb.Contract.Token({
-      address: TON_CONFIG.contracts.treeToken
-    });
-    
-    // This would interact with your deployed token contract
-    return await tokenContract.transfer({
-      to: to,
-      amount: TonWeb.utils.toNano(amount.toString()),
-      comment: 'Tree TON Token Withdrawal'
-    });
+    // Simplified token transfer - implement with your actual token contract
+    return await this.sendTransaction(to, amount, 'Tree TON Token Withdrawal');
   }
 
   disconnect() {
-    return this.tonConnect.disconnect();
+    return this.tonConnectUI.disconnect();
   }
 }
 

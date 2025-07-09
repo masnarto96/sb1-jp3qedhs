@@ -1,7 +1,7 @@
 {
-  "url": "https://your-domain.com",
+  "url": "https://tree-ton-app.netlify.app",
   "name": "Tree TON",
-  "iconUrl": "https://your-domain.com/icon-512x512.png",
-  "termsOfUseUrl": "https://your-domain.com/terms",
-  "privacyPolicyUrl": "https://your-domain.com/privacy"
+  "iconUrl": "https://tree-ton-app.netlify.app/vite.svg",
+  "termsOfUseUrl": "https://tree-ton-app.netlify.app/terms",
+  "privacyPolicyUrl": "https://tree-ton-app.netlify.app/privacy"
 }
