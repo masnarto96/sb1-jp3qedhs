@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { Buffer } from 'buffer';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,5 +16,6 @@ export default defineConfig({
   },
   define: {
     global: 'globalThis',
+    Buffer: Buffer,
   }
 });
